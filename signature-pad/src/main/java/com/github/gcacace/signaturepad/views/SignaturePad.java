@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -32,13 +31,11 @@ public class SignaturePad extends View {
     //View state
     private List<TimedPoint> mPoints;
     private boolean mIsEmpty;
-    private Boolean mHasEditState;
     private float mLastTouchX;
     private float mLastTouchY;
     private float mLastVelocity;
     private float mLastWidth;
     private RectF mDirtyRect;
-    private Bitmap mBitmapSavedState;
 
     private final SvgBuilder mSvgBuilder = new SvgBuilder();
 
@@ -72,9 +69,9 @@ public class SignaturePad extends View {
         super(context, attrs);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.SignaturePad,
-                0, 0);
+            attrs,
+            R.styleable.SignaturePad,
+            0, 0);
 
         //Configurable parameters
         try {
@@ -104,29 +101,6 @@ public class SignaturePad extends View {
                 return onDoubleClick();
             }
         });
-    }
-
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("superState", super.onSaveInstanceState());
-        if (this.mHasEditState == null || this.mHasEditState) {
-            this.mBitmapSavedState = this.getTransparentSignatureBitmap();
-        }
-        bundle.putParcelable("signatureBitmap", this.mBitmapSavedState);
-        return bundle;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle) {
-            Bundle bundle = (Bundle) state;
-            this.setSignatureBitmap((Bitmap) bundle.getParcelable("signatureBitmap"));
-            this.mBitmapSavedState = bundle.getParcelable("signatureBitmap");
-            state = bundle.getParcelable("superState");
-        }
-        this.mHasEditState = false;
-        super.onRestoreInstanceState(state);
     }
 
     /**
@@ -197,7 +171,6 @@ public class SignaturePad extends View {
 
     public void clear() {
         this.clearView();
-        this.mHasEditState = true;
     }
 
     @Override
@@ -236,10 +209,10 @@ public class SignaturePad extends View {
 
         //invalidate();
         invalidate(
-                (int) (mDirtyRect.left - mMaxWidth),
-                (int) (mDirtyRect.top - mMaxWidth),
-                (int) (mDirtyRect.right + mMaxWidth),
-                (int) (mDirtyRect.bottom + mMaxWidth));
+            (int) (mDirtyRect.left - mMaxWidth),
+            (int) (mDirtyRect.top - mMaxWidth),
+            (int) (mDirtyRect.right + mMaxWidth),
+            (int) (mDirtyRect.bottom + mMaxWidth));
 
         return true;
     }
@@ -334,9 +307,9 @@ public class SignaturePad extends View {
         int backgroundColor = Color.TRANSPARENT;
 
         int xMin = Integer.MAX_VALUE,
-                xMax = Integer.MIN_VALUE,
-                yMin = Integer.MAX_VALUE,
-                yMax = Integer.MIN_VALUE;
+            xMax = Integer.MIN_VALUE,
+            yMin = Integer.MAX_VALUE,
+            yMax = Integer.MIN_VALUE;
 
         boolean foundPixel = false;
 
@@ -453,7 +426,7 @@ public class SignaturePad extends View {
             velocity = Float.isNaN(velocity) ? 0.0f : velocity;
 
             velocity = mVelocityFilterWeight * velocity
-                    + (1 - mVelocityFilterWeight) * mLastVelocity;
+                + (1 - mVelocityFilterWeight) * mLastVelocity;
 
             // The new width is a function of the velocity. Higher velocities
             // correspond to thinner strokes.
@@ -481,7 +454,6 @@ public class SignaturePad extends View {
             TimedPoint firstPoint = mPoints.get(0);
             mPoints.add(getNewPoint(firstPoint.x, firstPoint.y));
         }
-        this.mHasEditState = true;
     }
 
     private void addBezier(Bezier curve, float startWidth, float endWidth) {
@@ -599,7 +571,7 @@ public class SignaturePad extends View {
     private void ensureSignatureBitmap() {
         if (mSignatureBitmap == null) {
             mSignatureBitmap = Bitmap.createBitmap(getWidth(), getHeight(),
-                    Bitmap.Config.ARGB_8888);
+                Bitmap.Config.ARGB_8888);
             mSignatureBitmapCanvas = new Canvas(mSignatureBitmap);
         }
     }
